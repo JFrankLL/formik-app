@@ -3,22 +3,43 @@ import { Formik, Form, Field, FieldArray } from 'formik';
 
 class DynamicForm extends React.Component {
   _renderGroup = ({ fieldName, fieldValues }) => {
+    const { handleRememberState, handleOnClickPlusIcon } = this.props;
+
     return (
       <FieldArray
         name={fieldName}
         render={arrayHelpers => (
           <div>
+            <div>{`values['${fieldName}']`}</div>
             {fieldValues && fieldValues.length > 0 ? (
               fieldValues.map((value, index) => (
                 <div key={index}>
                   <Field name={`${fieldName}.${index}`} />
-                  <button type="button" onClick={() => arrayHelpers.remove(index)}>-</button>
-                  <button type="button" onClick={() => arrayHelpers.insert(index, '')}>+</button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // arrayHelpers.remove(index);
+                    }}
+                  >
+                    -
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // arrayHelpers.insert(index, '');
+                      handleOnClickPlusIcon(fieldName, '');
+                    }}
+                  >
+                    +
+                  </button>
                 </div>
               ))
             ) : (
-                <button type="button" onClick={() => arrayHelpers.push('')}>{`Add a ${fieldName} field`}</button>
-              )}
+              <button
+                type="button"
+                onClick={() => arrayHelpers.push('')}
+              >{`Add a ${fieldName} field`}</button>
+            )}
           </div>
         )}
       />
@@ -28,9 +49,11 @@ class DynamicForm extends React.Component {
   _renderFormik = ({ values }) => {
     return (
       <Form>
-        {Object.keys(values).map((fieldName, idx) =>
-          <div key={idx}>{this._renderGroup({ fieldName, fieldValues: values[fieldName] })}</div>
-        )}
+        {Object.keys(values).map((fieldName, idx) => (
+          <div key={idx}>
+            {this._renderGroup({ fieldName, fieldValues: values[fieldName] })}
+          </div>
+        ))}
         <div>
           <button type="submit">Submit</button>
         </div>
@@ -43,8 +66,8 @@ class DynamicForm extends React.Component {
 
     return (
       <div>
-        <h1>Friend List</h1>
         <Formik
+          enableReinitialize
           initialValues={initialValues}
           onSubmit={values =>
             setTimeout(() => {
